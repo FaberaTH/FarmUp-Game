@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mini Tycoon — Missões Difíceis</title>
+  <style>
+    :root{
+      --bg:#0f1724; --card:#0b1220; --accent:#7c3aed; --muted:#94a3b8; --glass: rgba(255,255,255,0.04);
+      --success:#16a34a; --danger:#ef4444;
+    }
+    *{box-sizing:border-box;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial}
+    body,html{height:100%;margin:0;background:linear-gradient(180deg,#061021 0%, #07122a 100%);color:#e6eef8;}
+    .wrap{max-width:900px;margin:28px auto;padding:20px;}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+    .logo{font-weight:700;font-size:22px;color:var(--accent);display:flex;gap:10px;align-items:center;}
+    .logo .emoji{font-size:28px;}
+    .back-btn{
+      margin-left:auto;
+      background:transparent;
+      border:1px solid var(--accent);
+      padding:8px 14px;
+      border-radius:8px;
+      font-weight:700;
+      color:var(--accent);
+      cursor:pointer;
+      transition: background-color 0.3s ease;
+    }
+    .back-btn:hover{
+      background: var(--accent);
+      color: #fff;
+    }
+
+    h2{
+      margin-top:0;
+      margin-bottom:12px;
+      color: var(--accent);
+    }
+    .missions-list{
+      display:flex;
+      flex-direction: column;
+      gap:14px;
+    }
+    .mission-card{
+      background: var(--card);
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+      border: 1px solid transparent;
+      transition: border-color 0.3s ease;
+      cursor: default;
+    }
+    .mission-card:hover{
+      border-color: var(--accent);
+    }
+    .mission-title{
+      font-weight: 700;
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+    .mission-desc{
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+    .mission-reward{
+      font-weight: 700;
+      color: var(--success);
+    }
+    .mission-progress{
+      margin-top: 8px;
+      height: 12px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .mission-progress > div{
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+    .mission-button{
+      margin-top: 12px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .mission-button:disabled{
+      background: rgba(124,58,237,0.4);
+      cursor: not-allowed;
+    }
+    .mission-button:hover:not(:disabled){
+      background: #6b21a8;
+    }
+    .footer{
+      margin-top: 30px;
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">
+        <span class="emoji">🎯</span>
+        Missões Difíceis
+      </div>
+      <button class="back-btn" id="backBtn">Voltar ao jogo</button>
+    </header>
+
+    <h2>Desafios que exigem tempo e dedicação</h2>
+
+    <div class="missions-list" id="missionsList">
+      <!-- Missões serão renderizadas aqui -->
+    </div>
+
+    <div class="footer">Para completar as missões, você precisará investir bastante tempo, moedas e upgrades!</div>
+  </div>
+
+  <script>
+    // Missões difíceis, que precisam de muito tempo jogando
+    const missions = [
+      {
+        id: 'm1',
+        title: 'Trabalhador Incansável',
+        desc: 'Compre 50 Workers para acelerar sua produção ao máximo.',
+        reward: '5000 coins',
+        requirement: (state) => state.workers >= 50,
+        progress: (state) => Math.min(1, state.workers / 50)
+      },
+      {
+        id: 'm2',
+        title: 'Colheita Massiva',
+        desc: 'Colha um total de 100.000 coins durante o jogo (soma acumulada).',
+        reward: '10000 coins',
+        requirement: (state) => state.totalEarned >= 100000,
+        progress: (state) => Math.min(1, state.totalEarned / 100000)
+      },
+      {
+        id: 'm3',
+        title: 'Fazendeiro de Elite',
+        desc: 'Compre 30 Mini Fazendas para maximizar sua produção agrícola.',
+        reward: '8000 coins',
+        requirement: (state) => {
+          const farm = window.shopItems.find(i => i.id === 'farm');
+          return farm && farm.qty >= 30;
+        },
+        progress: (state) => {
+          const farm = window.shopItems.find(i => i.id === 'farm');
+          return farm ? Math.min(1, farm.qty / 30) : 0;
+        }
+      },
+      {
+        id: 'm4',
+        title: 'Indústria Pesada',
+        desc: 'Adquira 15 Fábricas para produzir em grande escala.',
+        reward: '15000 coins',
+        requirement: (state) => {
+          const factory = window.shopItems.find(i => i.id === 'factory');
+          return factory && factory.qty >= 15;
+        },
+        progress: (state) => {
+          const factory = window.shopItems.find(i => i.id === 'factory');
+          return factory ? Math.min(1, factory.qty / 15) : 0;
+        }
+      },
+      {
+        id: 'm5',
+        title: 'Upgrades Máximos',
+        desc: 'Compre todos os upgrades disponíveis no jogo.',
+        reward: '12000 coins',
+        requirement: (state) => {
+          return window.upgradesList.every(u => u.bought);
+        },
+        progress: (state) => {
+          const total = window.upgradesList.length;
+          const bought = window.upgradesList.filter(u => u.bought).length;
+          return total === 0 ? 0 : bought / total;
+        }
+      },
+      {
+        id: 'm6',
+        title: 'Jogador de Longa Jornada',
+        desc: 'Jogue por pelo menos 2 horas (7200 segundos).',
+        reward: '7000 coins',
+        requirement: (state) => state.timePlayed >= 7200,
+        progress: (state) => Math.min(1, state.timePlayed / 7200)
+      },
+      {
+        id: 'm7',
+        title: 'Mestre da Colheita',
+        desc: 'Realize 10.000 cliques de colher durante o jogo.',
+        reward: '9000 coins',
+        requirement: (state) => state.totalClicks >= 10000,
+        progress: (state) => Math.min(1, (state.totalClicks || 0) / 10000)
+      }
+    ];
+
+    // Estado mock se não existir (para testar offline)
+    if(!window.gameState){
+      window.gameState = {
+        workers: 0,
+        totalEarned: 0,
+        timePlayed: 0,
+        totalClicks: 0
+      };
+    }
+
+    // Função para renderizar as missões
+    function renderMissions(){
+      const container = document.getElementById('missionsList');
+      container.innerHTML = '';
+      missions.forEach(mission=>{
+        const prog = mission.progress(window.gameState);
+        const done = mission.requirement(window.gameState);
+        const card = document.createElement('div');
+        card.className = 'mission-card';
+
+        card.innerHTML = `
+          <div class="mission-title">${mission.title}</div>
+          <div class="mission-desc">${mission.desc}</div>
+          <div class="mission-reward">Recompensa: ${mission.reward}</div>
+          <div class="mission-progress"><div style="width:${prog*100}%"></div></div>
+          <button class="mission-button" ${done?'disabled':''} data-id="${mission.id}">${done ? 'Concluído' : 'Aceitar missão'}</button>
+        `;
+        container.appendChild(card);
+
+        // botão para aceitar missão
+        const btn = card.querySelector('button');
+        btn.addEventListener('click', ()=>{
+          alert(`Missão "${mission.title}" aceita! Boa sorte!`);
+          // aqui você pode implementar lógica extra de aceitar missão, armazenar estado, etc
+        });
+      });
+    }
+
+    // Botão voltar para página do jogo (index.html)
+    document.getElementById('backBtn').addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+
+    // Atualizar a lista de missões
+    renderMissions();
+
+    // Você precisa garantir que o objeto gameState do seu jogo esteja disponível aqui
+    // Para integrar de verdade, você pode passar dados do jogo para essa página,
+    // via localStorage ou outro método (se quiser, posso te ajudar nisso!)
+  </script>
+</body>
+</html>

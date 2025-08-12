@@ -1,0 +1,1072 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mini Tycoon — Farm & Upgrade</title>
+  <style>
+    :root {
+      /* Default dark blue theme */
+      --bg: #0f1724;
+      --card: #0b1220;
+      --accent: #7c3aed;
+      --muted: #94a3b8;
+      --glass: rgba(255, 255, 255, 0.04);
+      --success: #16a34a;
+      --danger: #ef4444;
+      --text: #e6eef8;
+    }
+    /* Clear mode overrides */
+    body.clear {
+      --bg: #f9fafb;
+      --card: #ffffff;
+      --accent: #3b82f6;
+      --muted: #6b7280;
+      --glass: rgba(0, 0, 0, 0.05);
+      --success: #22c55e;
+      --danger: #ef4444;
+      --text: #111827;
+    }
+
+    /* Palettes */
+    body.palette-red {
+      --accent: #ef4444;
+      --success: #dc2626;
+    }
+    body.palette-yellow {
+      --accent: #eab308;
+      --success: #ca8a04;
+    }
+    body.palette-purple {
+      --accent: #8b5cf6;
+      --success: #7c3aed;
+    }
+    body.palette-black {
+      --bg: #121212;
+      --card: #1e1e1e;
+      --accent: #f97316;
+      --muted: #9ca3af;
+      --glass: rgba(255, 255, 255, 0.03);
+      --success: #22c55e;
+      --danger: #ef4444;
+      --text: #f9fafb;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: Inter, ui-sans-serif, system-ui, Segoe UI, Roboto,
+        "Helvetica Neue", Arial;
+    }
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      transition: background-color 0.4s, color 0.4s;
+    }
+    .wrap {
+      max-width: 1100px;
+      margin: 28px auto;
+      padding: 20px;
+      position: relative;
+      display: flex;
+      gap: 20px;
+    }
+    header {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      width: 100%;
+    }
+    .logo {
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--accent);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .logo .emoji {
+      font-size: 26px;
+    }
+    .top-right {
+      margin-left: auto;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: 0 6px 18px rgba(2, 6, 23, 0.6);
+      color: var(--text);
+    }
+    .main {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 18px;
+      margin-top: 18px;
+      flex-grow: 1;
+      min-height: 600px;
+    }
+    .resource {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+      z-index: 2;
+    }
+    .panel {
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.02),
+        rgba(255, 255, 255, 0.01)
+      );
+      border-radius: 12px;
+      padding: 14px;
+    }
+    .big-num {
+      font-size: 36px;
+      font-weight: 700;
+    }
+    .sub {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .farm-btn {
+      display: block;
+      width: 100%;
+      padding: 18px;
+      border-radius: 10px;
+      border: 0;
+      font-size: 18px;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--accent), #4c1d95);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(124, 58, 237, 0.18);
+      transition: filter 0.3s ease;
+    }
+    .farm-btn:active {
+      transform: translateY(2px);
+    }
+    .farm-btn:disabled {
+      filter: grayscale(0.7);
+      cursor: not-allowed;
+    }
+    .shop {
+      display: grid;
+      gap: 10px;
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+    .item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border-radius: 8px;
+      background: var(--glass);
+      transition: background-color 0.3s ease;
+    }
+    .item.locked {
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+    .item .left {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .item .meta {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .item button {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 8px 10px;
+      border-radius: 8px;
+      color: inherit;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .item button:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+    .item button:hover:not(:disabled) {
+      background: var(--accent);
+      color: #fff;
+    }
+    .upgrades {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .upgrade {
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      transition: background-color 0.3s ease;
+    }
+    .upgrade:hover:not(:disabled) {
+      background: var(--accent);
+      color: #fff;
+    }
+    .upgrade:disabled,
+    .upgrade[disabled] {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+    .upgrade.bought {
+      border-color: var(--success);
+      color: var(--success);
+      font-weight: 700;
+    }
+    .right {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+      z-index: 2;
+    }
+    .log {
+      height: 120px;
+      overflow: auto;
+      padding: 8px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      font-size: 13px;
+    }
+    footer {
+      margin-top: 18px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .small {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .stat {
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      font-size: 13px;
+    }
+    .shop .cost {
+      font-weight: 700;
+    }
+    .progress {
+      height: 10px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress > i {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, #20c997, var(--accent));
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+    .controls {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 8px 10px;
+      border-radius: 8px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .btn-ghost:hover {
+      background: var(--accent);
+      color: white;
+    }
+    .btn-ghost:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    @media (max-width: 900px) {
+      .main {
+        grid-template-columns: 1fr;
+      }
+      .logo {
+        font-size: 16px;
+      }
+    }
+
+    /* --- New styles for background items visualization --- */
+    .background-items {
+      position: fixed;
+      top: 70px;
+      left: 10px;
+      width: 300px;
+      height: calc(100% - 90px);
+      pointer-events: none;
+      user-select: none;
+      overflow-y: auto;
+      padding: 10px;
+      z-index: 1;
+      background: rgba(11, 18, 32, 0.5);
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(124, 58, 237, 0.4);
+    }
+    .background-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .background-item .icon {
+      font-size: 22px;
+      transition: transform 0.3s ease;
+      display: inline-block;
+      user-select: none;
+    }
+    .background-item .count {
+      color: var(--success);
+      font-weight: 700;
+      min-width: 40px;
+      text-align: right;
+    }
+
+    /* --- Modal Config --- */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal {
+      background: var(--card);
+      padding: 24px;
+      border-radius: 16px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 8px 24px rgba(124, 58, 237, 0.7);
+      color: var(--text);
+    }
+    .modal h3 {
+      margin-top: 0;
+      color: var(--accent);
+    }
+    .modal label {
+      display: block;
+      margin: 12px 0 6px;
+      font-weight: 700;
+    }
+    .modal select {
+      width: 100%;
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      background: var(--glass);
+      color: var(--text);
+      font-size: 16px;
+      appearance: none;
+      cursor: pointer;
+      outline-offset: 2px;
+      outline-color: var(--accent);
+      transition: background-color 0.3s ease;
+    }
+    .modal button.close-btn {
+      margin-top: 20px;
+      background: var(--accent);
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.3s ease;
+    }
+    .modal button.close-btn:hover {
+      background: #4c1d95;
+    }
+    /* Tooltip to show locked reason */
+    .item.locked:hover::after {
+      content: attr(data-lockmsg);
+      position: absolute;
+      background: var(--danger);
+      color: white;
+      padding: 6px 10px;
+      font-size: 12px;
+      border-radius: 8px;
+      top: 38px;
+      left: 10px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0.9;
+      z-index: 20;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo card">
+        <span class="emoji">🌱</span>
+        Mini Tycoon — Farm & Upgrade
+      </div>
+      <div class="top-right">
+        <div class="card small">Salvar automático: <strong id="autoSaveStatus">ON</strong></div>
+        <div class="card small">Versão: 1.1</div>
+        <button id="configBtn" class="btn-ghost" title="Configurações">⚙️</button>
+      </div>
+    </header>
+
+    <div class="main">
+      <div class="resource">
+        <div class="panel card">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div>
+              <div class="big-num" id="coins">0</div>
+              <div class="sub">Coins</div>
+            </div>
+            <div style="margin-left:auto;text-align:right">
+              <div class="sub">Rendimento/sec</div>
+              <div id="cps" style="font-weight:700">0</div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px">
+            <button class="farm-btn" id="farmBtn">Colher +1</button>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn-ghost" id="doubleClick">x2 por 30s (10%)</button>
+              <button class="btn-ghost" id="speedBoost">Boost 2x Auto (20%)</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div class="sub">Loja</div>
+              <div style="font-weight:700">Compre geradores e upgrades</div>
+            </div>
+            <div class="sub">Dinheiro: <strong id="moneyTop">0</strong></div>
+          </div>
+
+          <div style="margin-top:12px" class="shop" id="shop">
+            <!-- itens vão aqui -->
+          </div>
+        </div>
+
+        <div class="panel card">
+          <div class="sub">Upgrades</div>
+          <div class="upgrades" id="upgrades"></div>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="panel card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div class="sub">Progresso</div>
+              <div style="font-weight:700" id="levelDisplay">Nível 1</div>
+            </div>
+            <button class="btn-ghost" id="resetGame">Reiniciar Jogo</button>
+          </div>
+
+          <div class="log" id="logArea"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fundo visualização dos itens -->
+  <div class="background-items" id="backgroundItems"></div>
+
+  <!-- Modal Configurações -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h3>Configurações do Jogo</h3>
+      <label for="themeMode">Modo de Tema</label>
+      <select id="themeMode">
+        <option value="dark">Escuro</option>
+        <option value="clear">Claro</option>
+      </select>
+
+      <label for="colorPalette">Paleta de Cores</label>
+      <select id="colorPalette">
+        <option value="default">Padrão (Azul)</option>
+        <option value="red">Vermelho</option>
+        <option value="yellow">Amarelo</option>
+        <option value="purple">Roxo</option>
+        <option value="black">Preto</option>
+      </select>
+
+      <button class="close-btn" id="closeConfig">Fechar</button>
+    </div>
+  </div>
+
+  <script>
+    // Dados iniciais do jogo e loja
+    const gameState = {
+      coins: 0,
+      cps: 0, // coins per second
+      totalEarned: 0,
+      workers: 0,
+      miniFarms: 0,
+      factories: 0,
+      powerPlants: 0,
+      labs: 0,
+      dataCenters: 0,
+      distributionNets: 0,
+      megaFarms: 0,
+      energyPlants: 0,
+      transportCos: 0,
+      headquarters: 0,
+      smartCities: 0,
+      farmCountries: 0,
+      industrialEmpires: 0,
+      progressMetropolis: 0,
+      level: 1,
+      timePlayed: 0,
+      totalClicks: 0,
+      doubleClickActive: false,
+      speedBoostActive: false
+    };
+
+    // Lista hierárquica da loja (id, nome, custo base, requisito, emoji para visual)
+    // requisito: função que recebe gameState e retorna boolean (libera compra)
+    const shopItems = [
+      {
+        id: 'worker',
+        name: 'Worker',
+        cost: 15,
+        emoji: '👷',
+        req: () => true,
+        qtyKey: 'workers',
+        cps: 1
+      },
+      {
+        id: 'miniFarm',
+        name: 'Mini Fazenda',
+        cost: 100,
+        emoji: '🌾',
+        req: (s) => s.workers >= 10,
+        qtyKey: 'miniFarms',
+        cps: 10
+      },
+      {
+        id: 'factory',
+        name: 'Fábrica',
+        cost: 700,
+        emoji: '🏭',
+        req: (s) => s.miniFarms >= 20,
+        qtyKey: 'factories',
+        cps: 50
+      },
+      {
+        id: 'powerPlant',
+        name: 'Usina',
+        cost: 6000,
+        emoji: '⚡',
+        req: (s) => s.factories >= 10,
+        qtyKey: 'powerPlants',
+        cps: 300
+      },
+      {
+        id: 'lab',
+        name: 'Laboratório',
+        cost: 15000,
+        emoji: '🔬',
+        req: (s) => s.powerPlants >= 5,
+        qtyKey: 'labs',
+        cps: 700
+      },
+      {
+        id: 'dataCenter',
+        name: 'Central de Dados',
+        cost: 50000,
+        emoji: '🖥️',
+        req: (s) => s.labs >= 3,
+        qtyKey: 'dataCenters',
+        cps: 1500
+      },
+      {
+        id: 'distributionNet',
+        name: 'Rede de Distribuição',
+        cost: 150000,
+        emoji: '📡',
+        req: (s) => s.dataCenters >= 2,
+        qtyKey: 'distributionNets',
+        cps: 4000
+      },
+      {
+        id: 'megaFarm',
+        name: 'MegaFazenda',
+        cost: 500000,
+        emoji: '🚜',
+        req: (s) => s.distributionNets >= 5,
+        qtyKey: 'megaFarms',
+        cps: 12000
+      },
+      {
+        id: 'energyPlant',
+        name: 'Planta de Energia',
+        cost: 2500000,
+        emoji: '🔥',
+        req: (s) => s.megaFarms >= 3,
+        qtyKey: 'energyPlants',
+        cps: 30000
+      },
+      {
+        id: 'transportCo',
+        name: 'Companhia de Transporte',
+        cost: 8500000,
+        emoji: '🚛',
+        req: (s) => s.energyPlants >= 4,
+        qtyKey: 'transportCos',
+        cps: 85000
+      },
+      {
+        id: 'headquarters',
+        name: 'Sede Corporativa',
+        cost: 40000000,
+        emoji: '🏢',
+        req: (s) => s.transportCos >= 3,
+        qtyKey: 'headquarters',
+        cps: 200000
+      },
+      {
+        id: 'smartCity',
+        name: 'Cidade Inteligente',
+        cost: 150000000,
+        emoji: '🏙️',
+        req: (s) => s.headquarters >= 2,
+        qtyKey: 'smartCities',
+        cps: 800000
+      },
+      {
+        id: 'farmCountry',
+        name: 'País das Fazendas',
+        cost: 750000000,
+        emoji: '🌍',
+        req: (s) => s.smartCities >= 1,
+        qtyKey: 'farmCountries',
+        cps: 3000000
+      },
+      {
+        id: 'industrialEmpire',
+        name: 'Império Industrial',
+        cost: 3500000000,
+        emoji: '🏰',
+        req: (s) => s.farmCountries >= 1,
+        qtyKey: 'industrialEmpires',
+        cps: 12000000
+      },
+      {
+        id: 'metropolis',
+        name: 'Metrópole do Progresso',
+        cost: 15000000000,
+        emoji: '🌆',
+        req: (s) => s.industrialEmpires >= 1,
+        qtyKey: 'progressMetropolis',
+        cps: 50000000
+      }
+    ];
+
+    // Upgrades simplificados, só pra exemplo (pode expandir depois)
+    const upgradesList = [
+      {
+        id: 'upgrade1',
+        name: 'Colheita mais rápida',
+        cost: 500,
+        bought: false,
+        effect: () => {
+          gameState.cps *= 1.2;
+          log('Upgrade comprado: Colheita mais rápida (+20%)');
+        },
+        req: () => true,
+      },
+      {
+        id: 'upgrade2',
+        name: 'Trabalhadores mais eficientes',
+        cost: 2000,
+        bought: false,
+        effect: () => {
+          gameState.cps *= 1.5;
+          log('Upgrade comprado: Trabalhadores mais eficientes (+50%)');
+        },
+        req: () => gameState.workers >= 20,
+      }
+    ];
+
+    // Elementos do DOM
+    const coinsDisplay = document.getElementById('coins');
+    const cpsDisplay = document.getElementById('cps');
+    const farmBtn = document.getElementById('farmBtn');
+    const shopContainer = document.getElementById('shop');
+    const upgradesContainer = document.getElementById('upgrades');
+    const logArea = document.getElementById('logArea');
+    const moneyTop = document.getElementById('moneyTop');
+    const resetBtn = document.getElementById('resetGame');
+    const backgroundItems = document.getElementById('backgroundItems');
+    const configBtn = document.getElementById('configBtn');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const themeModeSelect = document.getElementById('themeMode');
+    const colorPaletteSelect = document.getElementById('colorPalette');
+
+    // Função para atualizar tela
+    function updateUI() {
+      coinsDisplay.textContent = formatNum(gameState.coins);
+      moneyTop.textContent = formatNum(gameState.coins);
+      cpsDisplay.textContent = formatNum(gameState.cps.toFixed(1));
+
+      // Atualiza nível
+      document.getElementById('levelDisplay').textContent = 'Nível ' + gameState.level;
+
+      // Atualiza botões loja
+      shopItems.forEach(item => {
+        const btn = document.querySelector(`button[data-id="${item.id}"]`);
+        if (!btn) return;
+
+        const unlocked = item.req(gameState);
+        btn.disabled = !unlocked || gameState.coins < item.cost;
+
+        // Atualiza texto botão
+        btn.textContent = `Comprar (${formatNum(item.cost)})`;
+        if (!unlocked) {
+          btn.parentElement.classList.add('locked');
+          btn.parentElement.dataset.lockmsg = `Requer mais ${item.reqDesc || 'nível/quantidade'}`;
+        } else {
+          btn.parentElement.classList.remove('locked');
+          btn.parentElement.removeAttribute('data-lockmsg');
+        }
+      });
+
+      // Atualiza upgrades
+      upgradesList.forEach(upg => {
+        const btn = document.querySelector(`button[data-upg="${upg.id}"]`);
+        if (!btn) return;
+        btn.disabled = upg.bought || gameState.coins < upg.cost || !upg.req();
+        btn.textContent = upg.bought ? 'Comprado' : `Comprar (${formatNum(upg.cost)})`;
+        if (upg.bought) {
+          btn.classList.add('bought');
+        } else {
+          btn.classList.remove('bought');
+        }
+      });
+
+      renderBackgroundItems();
+    }
+
+    // Função de formatação para números grandes
+    function formatNum(n) {
+      if (n >= 1e12) return (n / 1e12).toFixed(2) + 'T';
+      if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+      if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+      if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+      return n.toString();
+    }
+
+    // Função para adicionar log
+    function log(msg) {
+      const now = new Date().toLocaleTimeString();
+      logArea.textContent = `[${now}] ${msg}\n` + logArea.textContent;
+    }
+
+    // Renderiza loja
+    function renderShop() {
+      shopContainer.innerHTML = '';
+      shopItems.forEach(item => {
+        const unlocked = item.req(gameState);
+        const qty = gameState[item.qtyKey] || 0;
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'item' + (unlocked ? '' : ' locked');
+        itemDiv.dataset.lockmsg = unlocked ? '' : `Requer mais ${getReqText(item)}`;
+        itemDiv.innerHTML = `
+          <div class="left">
+            <span class="icon">${item.emoji}</span>
+            <div>
+              <div>${item.name}</div>
+              <div class="meta">Você possui: ${qty}</div>
+            </div>
+          </div>
+          <button data-id="${item.id}">Comprar (${formatNum(item.cost)})</button>
+        `;
+        shopContainer.appendChild(itemDiv);
+      });
+    }
+
+    // Retorna texto legível para requisito
+    function getReqText(item) {
+      // Exemplo simples para legibilidade
+      switch (item.id) {
+        case 'miniFarm': return '10 Workers';
+        case 'factory': return '20 Mini Fazendas';
+        case 'powerPlant': return '10 Fábricas';
+        case 'lab': return '5 Usinas';
+        case 'dataCenter': return '3 Laboratórios';
+        case 'distributionNet': return '2 Centrais de Dados';
+        case 'megaFarm': return '5 Redes de Distribuição';
+        case 'energyPlant': return '3 MegaFazendas';
+        case 'transportCo': return '4 Plantas de Energia';
+        case 'headquarters': return '3 Companhias de Transporte';
+        case 'smartCity': return '2 Sedes Corporativas';
+        case 'farmCountry': return '1 Cidade Inteligente';
+        case 'industrialEmpire': return '1 País das Fazendas';
+        case 'metropolis': return '1 Império Industrial';
+        default: return 'Nível anterior';
+      }
+    }
+
+    // Renderiza upgrades
+    function renderUpgrades() {
+      upgradesContainer.innerHTML = '';
+      upgradesList.forEach(upg => {
+        const btn = document.createElement('button');
+        btn.className = 'upgrade';
+        btn.dataset.upg = upg.id;
+        btn.textContent = upg.bought ? 'Comprado' : `Comprar (${formatNum(upg.cost)})`;
+        btn.disabled = upg.bought || gameState.coins < upg.cost || !upg.req();
+        if (upg.bought) btn.classList.add('bought');
+        upgradesContainer.appendChild(btn);
+
+        btn.addEventListener('click', () => {
+          if (gameState.coins >= upg.cost && !upg.bought && upg.req()) {
+            gameState.coins -= upg.cost;
+            upg.bought = true;
+            upg.effect();
+            updateCPS();
+            log(`Upgrade comprado: ${upg.name}`);
+            updateUI();
+          }
+        });
+      });
+    }
+
+    // Calcula CPS total baseado nos itens
+    function updateCPS() {
+      let cps = 0;
+      shopItems.forEach(item => {
+        const qty = gameState[item.qtyKey] || 0;
+        cps += qty * item.cps;
+      });
+      // Aplica buffs de upgrades se quiser
+      // Aqui só como exemplo simples
+      if (upgradesList[0].bought) cps *= 1.2;
+      if (upgradesList[1].bought) cps *= 1.5;
+      gameState.cps = cps;
+    }
+
+    // Renderiza visualização dos itens no fundo
+    function renderBackgroundItems() {
+      backgroundItems.innerHTML = '';
+      shopItems.forEach(item => {
+        const qty = gameState[item.qtyKey] || 0;
+        if (qty > 0) {
+          const div = document.createElement('div');
+          div.className = 'background-item';
+          div.innerHTML = `
+            <span class="icon" style="transform: scale(${1 + Math.log10(qty+1)})">${item.emoji}</span>
+            <span>${item.name}</span>
+            <span class="count">${formatNum(qty)}</span>
+          `;
+          backgroundItems.appendChild(div);
+        }
+      });
+    }
+
+    // Compra item da loja
+    shopContainer.addEventListener('click', e => {
+      const btn = e.target.closest('button[data-id]');
+      if (!btn) return;
+      const id = btn.dataset.id;
+      const item = shopItems.find(i => i.id === id);
+      if (!item) return;
+
+      if (!item.req(gameState)) {
+        alert('Você ainda não pode comprar este item!');
+        return;
+      }
+      if (gameState.coins < item.cost) {
+        alert('Você não tem coins suficientes!');
+        return;
+      }
+
+      gameState.coins -= item.cost;
+      gameState[item.qtyKey] = (gameState[item.qtyKey] || 0) + 1;
+      updateCPS();
+      updateUI();
+      log(`Comprou 1 ${item.name} por ${formatNum(item.cost)} coins`);
+    });
+
+    // Botão colher
+    farmBtn.addEventListener('click', () => {
+      let gain = 1;
+      if (gameState.doubleClickActive) gain *= 2;
+      gameState.coins += gain;
+      gameState.totalClicks++;
+      updateUI();
+      log(`Colheu +${gain} coins.`);
+    });
+
+    // Eventos upgrades botões extras (por enquanto não implementados)
+    document.getElementById('doubleClick').addEventListener('click', () => {
+      if (gameState.coins < 10) {
+        alert('Faltam coins para ativar o Double Click!');
+        return;
+      }
+      if (gameState.doubleClickActive) {
+        alert('Double Click já está ativo!');
+        return;
+      }
+      gameState.coins -= 10;
+      gameState.doubleClickActive = true;
+      log('Double Click ativado por 30 segundos!');
+      updateUI();
+      setTimeout(() => {
+        gameState.doubleClickActive = false;
+        log('Double Click terminou!');
+        updateUI();
+      }, 30000);
+    });
+    document.getElementById('speedBoost').addEventListener('click', () => {
+      if (gameState.coins < 20) {
+        alert('Faltam coins para ativar Speed Boost!');
+        return;
+      }
+      if (gameState.speedBoostActive) {
+        alert('Speed Boost já está ativo!');
+        return;
+      }
+      gameState.coins -= 20;
+      gameState.speedBoostActive = true;
+      log('Speed Boost de Auto-Click 2x ativado por 30 segundos!');
+      updateUI();
+      const intervalId = setInterval(() => {
+        gameState.coins += gameState.cps;
+        updateUI();
+      }, 500);
+      setTimeout(() => {
+        gameState.speedBoostActive = false;
+        clearInterval(intervalId);
+        log('Speed Boost terminou!');
+        updateUI();
+      }, 30000);
+    });
+
+    // Game loop que adiciona coins automaticamente
+    setInterval(() => {
+      gameState.coins += gameState.cps;
+      gameState.totalEarned += gameState.cps;
+      gameState.timePlayed++;
+      updateUI();
+    }, 1000);
+
+    // Botão reiniciar jogo
+    resetBtn.addEventListener('click', () => {
+      if (confirm('Tem certeza que deseja reiniciar o jogo? Todo progresso será perdido.')) {
+        localStorage.removeItem('miniTycoonSave');
+        location.reload();
+      }
+    });
+
+    // Salvar jogo a cada 5 segundos
+    setInterval(() => {
+      saveGame();
+    }, 5000);
+
+    // Salvar no localStorage
+    function saveGame() {
+      const saveData = {
+        ...gameState,
+        upgrades: upgradesList.map(u => u.bought)
+      };
+      localStorage.setItem('miniTycoonSave', JSON.stringify(saveData));
+      document.getElementById('autoSaveStatus').textContent = 'ON';
+    }
+
+    // Carregar do localStorage
+    function loadGame() {
+      const saved = localStorage.getItem('miniTycoonSave');
+      if (!saved) return false;
+      try {
+        const data = JSON.parse(saved);
+        Object.assign(gameState, data);
+        upgradesList.forEach((u, i) => u.bought = data.upgrades ? data.upgrades[i] : false);
+        updateCPS();
+        log('Jogo carregado do armazenamento local.');
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    // Configurações - abrir e fechar modal
+    configBtn.addEventListener('click', () => {
+      modalOverlay.classList.add('active');
+      // Atualiza selects para estado atual
+      themeModeSelect.value = document.body.classList.contains('clear') ? 'clear' : 'dark';
+      const bodyClasses = [...document.body.classList];
+      const paletteClass = bodyClasses.find(c => c.startsWith('palette-')) || 'palette-default';
+      colorPaletteSelect.value = paletteClass.replace('palette-', '');
+    });
+
+    document.getElementById('closeConfig').addEventListener('click', () => {
+      modalOverlay.classList.remove('active');
+    });
+
+    // Aplicar configurações
+    themeModeSelect.addEventListener('change', () => {
+      if (themeModeSelect.value === 'clear') {
+        document.body.classList.add('clear');
+      } else {
+        document.body.classList.remove('clear');
+      }
+    });
+    colorPaletteSelect.addEventListener('change', () => {
+      document.body.classList.remove('palette-red', 'palette-yellow', 'palette-purple', 'palette-black', 'palette-default');
+      if (colorPaletteSelect.value !== 'default') {
+        document.body.classList.add('palette-' + colorPaletteSelect.value);
+      }
+    });
+
+    // Formatar número para exibição
+    // Já definido acima
+
+    // Inicialização
+    function init() {
+      renderShop();
+      renderUpgrades();
+      if (!loadGame()) {
+        updateCPS();
+      }
+      updateUI();
+      log('Bem vindo ao Mini Tycoon! Comece colhendo moedas e comprando itens.');
+    }
+    init();
+  </script>
+</body>
+</html>
