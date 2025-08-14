@@ -1,3 +1,4 @@
+<!-- Novo index.html com as mudanças solicitadas -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -15,23 +16,25 @@
   --danger: #ef4444;
   --text: #e6eef8;
 }
-/* Paletas extras usadas pelo seletor no modal */
 body.palette-red { --accent: #ef4444; }
 body.palette-yellow { --accent: #f59e0b; }
 body.palette-purple { --accent: #7c3aed; }
 body.palette-black { --accent: #111827; }
 body.palette-default { --accent: #7c3aed; }
-
 body.clear {
   --bg: #f9fafb;
   --card: #ffffff;
-  --accent: #3b82f6;
   --muted: #6b7280;
   --glass: rgba(0, 0, 0, 0.05);
   --success: #22c55e;
   --danger: #ef4444;
   --text: #111827;
 }
+body.clear.palette-red { --accent: #ef4444; }
+body.clear.palette-yellow { --accent: #f59e0b; }
+body.clear.palette-purple { --accent: #7c3aed; }
+body.clear.palette-black { --accent: #111827; }
+body.clear.palette-default { --accent: #3b82f6; }
 * { box-sizing: border-box; }
 body {
   margin: 0;
@@ -92,46 +95,12 @@ button.icon {
   color: var(--text);
 }
 button.icon:hover { border-color: var(--accent); }
-
 .main {
-  display: grid;
-  grid-template-columns: 1fr 360px;
+  display: flex;
+  flex-direction: column;
   gap: 20px;
   padding: 20px;
-  align-items: start;
 }
-.farm-area {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.farm-canvas {
-  min-height: 320px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--muted);
-  font-size: 14px;
-  padding: 12px;
-  border: 1px dashed rgba(255,255,255,0.08);
-}
-.background-items {
-  background: var(--glass);
-  border-radius: 10px;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.background-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px;
-}
-.background-item .left { display: flex; align-items: center; gap: 8px; }
 .right-column {
   display: flex;
   flex-direction: column;
@@ -143,46 +112,41 @@ button.icon:hover { border-color: var(--accent); }
   padding: 12px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.35);
 }
-.big-num {
-  font-size: 28px;
-  font-weight: 700;
-}
-.sub {
-  font-size: 12px;
-  color: var(--muted);
-  margin-bottom: 8px;
-}
-.shop, .upgrades, .log {
-  max-height: 200px;
-  overflow-y: auto;
-}
+.big-num { font-size: 28px; font-weight: 700; }
+.sub { font-size: 14px; color: var(--muted); margin-bottom: 8px; font-weight: 600; }
+.shop, .upgrades, .log { max-height: 240px; overflow-y: auto; }
 .item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px;
+  padding: 12px;
   border-radius: 8px;
   background: var(--glass);
-  margin-bottom: 6px;
+  margin-bottom: 10px;
   gap: 10px;
 }
 .item .left { display: flex; align-items: center; gap: 10px; }
-.item .icon { font-size: 18px; }
-.item.locked { opacity: 0.5; position: relative; }
-.item.locked::after {
-  content: attr(data-lockmsg);
-  position: absolute; left: 8px; right: 8px; bottom: 8px;
-  font-size: 11px; color: var(--muted);
+.item .icon { font-size: 20px; }
+.item button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
 }
+.item button:hover { opacity: 0.85; }
 .upgrade {
   width: 100%;
   text-align: left;
-  padding: 10px 12px;
+  padding: 12px;
   border-radius: 8px;
   background: var(--glass);
   margin-bottom: 6px;
   border: 1px solid transparent;
   cursor: pointer;
+  color: var(--text);
 }
 .upgrade.bought { opacity: 0.6; border-color: var(--accent); }
 .farm-btn {
@@ -195,129 +159,46 @@ button.icon:hover { border-color: var(--accent); }
   font-weight: 700;
   cursor: pointer;
 }
-.row { display: flex; gap: 10px; align-items: center; }
+.row { display: flex; gap: 10px; align-items: center; justify-content: space-between; }
 .kv { font-size: 13px; color: var(--muted); }
 .kv .v { color: var(--text); font-weight: 700; }
-
-/* Modal de configurações */
-#modalOverlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.5);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  z-index: 50;
-}
-#modalOverlay.active { display: flex; }
-.modal {
-  width: 100%;
-  max-width: 520px;
-  background: var(--card);
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
-}
-.modal header { display:flex; align-items:center; justify-content:space-between; margin-bottom: 10px; }
-.modal h3 { margin: 0; font-size: 18px; }
-.modal .grid { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
-.modal label { font-size: 13px; color: var(--muted); display:block; margin-bottom: 6px; }
-.modal select { width: 100%; padding: 8px; border-radius: 8px; background: var(--glass); color: var(--text); border: 1px solid rgba(255,255,255,0.08); }
-.modal .actions { display:flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
-.modal .danger { background: var(--danger); border: none; color: #fff; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
-.modal .close { background: var(--glass); border: 1px solid transparent; color: var(--text); padding: 8px 12px; border-radius: 8px; cursor: pointer; }
-.modal .close:hover { border-color: var(--accent); }
-.boosts button { width: 100%; padding: 8px 10px; border-radius: 8px; border: none; background: var(--accent); color: #fff; cursor:pointer; }
-.boosts .hint { font-size: 12px; color: var(--muted); }
 </style>
 </head>
 <body>
-
 <header>
   <div class="logo">🌱 Mini Tycoon — Farm & Upgrade</div>
   <div class="meta">
-    <span class="badge" title="Seu dinheiro atual">💰 <span id="moneyTop">0</span></span>
-    <span class="badge" title="Seu nível atual">🏅 <span id="levelDisplay">Nível 1</span></span>
+    <span class="badge">💰 <span id="moneyTop">0</span></span>
+    <span class="badge">🏅 <span id="levelDisplay">Nível 1</span></span>
   </div>
   <div class="top-right">
-    <div class="card small">Salvar: <strong id="autoSaveStatus">ON</strong></div>
-    <div class="card small">Versão: 1.1</div>
-    <button id="configBtn" class="icon" title="Configurações">⚙️</button>
+    <button onclick="window.location.href='missions.html'" class="icon">🎯</button>
+    <button id="configBtn" class="icon">⚙️</button>
   </div>
 </header>
-
 <div class="main">
-  <div class="farm-area">
-    <div class="farm-canvas">Área da Fazenda</div>
-    <div class="background-items" id="backgroundItems"></div>
+  <div class="panel">
+    <div class="row">
+      <div>
+        <div class="big-num" id="coins">0</div>
+        <div class="kv">CPS: <span class="v" id="cps">0</span></div>
+      </div>
+      <button class="farm-btn" id="farmBtn">Colher +1</button>
+    </div>
   </div>
-  <div class="right-column">
-    <div class="panel">
-      <div class="row" style="justify-content: space-between;">
-        <div>
-          <div class="big-num" id="coins">0</div>
-          <div class="kv">CPS: <span class="v" id="cps">0</span></div>
-        </div>
-      </div>
-      <button class="farm-btn" id="farmBtn" style="margin-top:10px;">Colher +1</button>
-    </div>
-
-    <div class="panel boosts">
-      <div class="sub">Boosts rápidos</div>
-      <div class="row">
-        <button id="doubleClick" title="Dobra o ganho do clique por 30s (custa 10 coins)">Ativar Double Click</button>
-        <button id="speedBoost" title="Auto-colheita 2x por 30s (custa 20 coins)">Ativar Speed Boost</button>
-      </div>
-      <div class="hint">Os boosts consomem coins e duram 30 segundos.</div>
-    </div>
-
-    <div class="panel">
-      <div class="sub">Loja</div>
-      <div class="shop" id="shop"></div>
-    </div>
-    <div class="panel">
-      <div class="sub">Upgrades</div>
-      <div class="upgrades" id="upgrades"></div>
-    </div>
-    <div class="panel">
-      <div class="sub">Progresso</div>
-      <div class="log" id="logArea" style="white-space:pre-wrap;"></div>
-    </div>
+  <div class="panel">
+    <div class="sub">Loja</div>
+    <div class="shop" id="shop"></div>
+  </div>
+  <div class="panel">
+    <div class="sub">Upgrades</div>
+    <div class="upgrades" id="upgrades"></div>
+  </div>
+  <div class="panel">
+    <div class="sub">Progresso</div>
+    <div class="log" id="logArea" style="white-space:pre-wrap;"></div>
   </div>
 </div>
-
-<!-- Modal de Configurações -->
-<div id="modalOverlay">
-  <div class="modal">
-    <header>
-      <h3>Configurações</h3>
-      <button id="closeConfig" class="close">Fechar</button>
-    </header>
-    <div class="grid">
-      <div>
-        <label for="themeMode">Tema</label>
-        <select id="themeMode">
-          <option value="dark">Escuro</option>
-          <option value="clear">Claro</option>
-        </select>
-      </div>
-      <div>
-        <label for="colorPalette">Paleta de cor</label>
-        <select id="colorPalette">
-          <option value="default">Padrão</option>
-          <option value="red">Vermelho</option>
-          <option value="yellow">Amarelo</option>
-          <option value="purple">Roxo</option>
-          <option value="black">Preto</option>
-        </select>
-      </div>
-    </div>
-    <div class="actions">
-      <button id="resetGame" class="danger">Resetar jogo</button>
-    </div>
-  </div>
-</div>
-
 <script>
     // Dados iniciais do jogo e loja
     const gameState = {
@@ -857,6 +738,5 @@ button.icon:hover { border-color: var(--accent); }
     }
     init();
   </script>
-
 </body>
 </html>

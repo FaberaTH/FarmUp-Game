@@ -1,3 +1,4 @@
+<!-- Novo missions.html com ajustes visuais para integrar ao novo index.html -->
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -7,127 +8,49 @@
   <style>
     :root{
       --bg:#0f1724; --card:#0b1220; --accent:#7c3aed; --muted:#94a3b8; --glass: rgba(255,255,255,0.04);
-      --success:#16a34a; --danger:#ef4444;
+      --success:#16a34a; --danger:#ef4444; --text:#e6eef8;
     }
-    *{box-sizing:border-box;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial}
-    body,html{height:100%;margin:0;background:linear-gradient(180deg,#061021 0%, #07122a 100%);color:#e6eef8;}
+    body.palette-red { --accent: #ef4444; }
+    body.palette-yellow { --accent: #f59e0b; }
+    body.palette-purple { --accent: #7c3aed; }
+    body.palette-black { --accent: #111827; }
+    body.palette-default { --accent: #7c3aed; }
+    *{box-sizing:border-box;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;margin:0;}
+    body,html{min-height:100%;background:var(--bg);color:var(--text);}
     .wrap{max-width:900px;margin:28px auto;padding:20px;}
-    header{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
-    .logo{font-weight:700;font-size:22px;color:var(--accent);display:flex;gap:10px;align-items:center;}
-    .logo .emoji{font-size:28px;}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:20px;background:var(--card);padding:12px 20px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.4);}
+    .logo{font-weight:700;font-size:20px;color:var(--accent);display:flex;gap:10px;align-items:center;}
+    .logo .emoji{font-size:24px;}
     .back-btn{
-      margin-left:auto;
-      background:transparent;
-      border:1px solid var(--accent);
-      padding:8px 14px;
-      border-radius:8px;
-      font-weight:700;
-      color:var(--accent);
-      cursor:pointer;
-      transition: background-color 0.3s ease;
+      margin-left:auto;background:var(--accent);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-weight:700;cursor:pointer;
     }
-    .back-btn:hover{
-      background: var(--accent);
-      color: #fff;
-    }
-
-    h2{
-      margin-top:0;
-      margin-bottom:12px;
-      color: var(--accent);
-    }
-    .missions-list{
-      display:flex;
-      flex-direction: column;
-      gap:14px;
-    }
-    .mission-card{
-      background: var(--card);
-      border-radius: 12px;
-      padding: 16px 20px;
-      box-shadow: 0 6px 18px rgba(2,6,23,0.6);
-      border: 1px solid transparent;
-      transition: border-color 0.3s ease;
-      cursor: default;
-    }
-    .mission-card:hover{
-      border-color: var(--accent);
-    }
-    .mission-title{
-      font-weight: 700;
-      font-size: 18px;
-      margin-bottom: 6px;
-    }
-    .mission-desc{
-      font-size: 14px;
-      color: var(--muted);
-      margin-bottom: 8px;
-      line-height: 1.3;
-    }
-    .mission-reward{
-      font-weight: 700;
-      color: var(--success);
-    }
-    .mission-progress{
-      margin-top: 8px;
-      height: 12px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .mission-progress > div{
-      height: 100%;
-      background: var(--accent);
-      width: 0%;
-      transition: width 0.4s ease;
-    }
-    .mission-button{
-      margin-top: 12px;
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      padding: 10px 18px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    .mission-button:disabled{
-      background: rgba(124,58,237,0.4);
-      cursor: not-allowed;
-    }
-    .mission-button:hover:not(:disabled){
-      background: #6b21a8;
-    }
-    .footer{
-      margin-top: 30px;
-      font-size: 13px;
-      color: var(--muted);
-      text-align: center;
-    }
+    .back-btn:hover{opacity:0.85;}
+    h2{margin:10px 0 20px;color:var(--accent);}
+    .missions-list{display:flex;flex-direction:column;gap:14px;}
+    .mission-card{background:var(--card);border-radius:12px;padding:16px 20px;box-shadow:0 4px 12px rgba(0,0,0,0.4);border:1px solid transparent;transition:border-color 0.3s ease;}
+    .mission-card:hover{border-color:var(--accent);}
+    .mission-title{font-weight:700;font-size:18px;margin-bottom:6px;}
+    .mission-desc{font-size:14px;color:var(--muted);margin-bottom:8px;line-height:1.4;}
+    .mission-reward{font-weight:700;color:var(--success);}
+    .mission-progress{margin-top:8px;height:12px;background:rgba(255,255,255,0.1);border-radius:8px;overflow:hidden;}
+    .mission-progress>div{height:100%;background:var(--accent);width:0%;transition:width 0.4s ease;}
+    .mission-button{margin-top:12px;background:var(--accent);color:white;border:none;border-radius:8px;padding:10px 18px;font-weight:700;cursor:pointer;}
+    .mission-button:disabled{background:rgba(124,58,237,0.4);cursor:not-allowed;}
+    .mission-button:hover:not(:disabled){opacity:0.85;}
+    .footer{margin-top:30px;font-size:13px;color:var(--muted);text-align:center;}
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <div class="logo">
-        <span class="emoji">🎯</span>
-        Missões Difíceis
-      </div>
+      <div class="logo"><span class="emoji">🎯</span> Missões Difíceis</div>
       <button class="back-btn" id="backBtn">Voltar ao jogo</button>
     </header>
-
     <h2>Desafios que exigem tempo e dedicação</h2>
-
-    <div class="missions-list" id="missionsList">
-      <!-- Missões serão renderizadas aqui -->
-    </div>
-
+    <div class="missions-list" id="missionsList"></div>
     <div class="footer">Para completar as missões, você precisará investir bastante tempo, moedas e upgrades!</div>
   </div>
-
   <script>
-    // Missões difíceis, que precisam de muito tempo jogando
     const missions = [
       {
         id: 'm1',
@@ -204,56 +127,25 @@
         progress: (state) => Math.min(1, (state.totalClicks || 0) / 10000)
       }
     ];
-
-    // Estado mock se não existir (para testar offline)
-    if(!window.gameState){
-      window.gameState = {
-        workers: 0,
-        totalEarned: 0,
-        timePlayed: 0,
-        totalClicks: 0
-      };
-    }
-
-    // Função para renderizar as missões
+    if(!window.gameState){window.gameState={workers:0,totalEarned:0,timePlayed:0,totalClicks:0};}
     function renderMissions(){
-      const container = document.getElementById('missionsList');
-      container.innerHTML = '';
-      missions.forEach(mission=>{
-        const prog = mission.progress(window.gameState);
-        const done = mission.requirement(window.gameState);
-        const card = document.createElement('div');
-        card.className = 'mission-card';
-
-        card.innerHTML = `
-          <div class="mission-title">${mission.title}</div>
-          <div class="mission-desc">${mission.desc}</div>
-          <div class="mission-reward">Recompensa: ${mission.reward}</div>
-          <div class="mission-progress"><div style="width:${prog*100}%"></div></div>
-          <button class="mission-button" ${done?'disabled':''} data-id="${mission.id}">${done ? 'Concluído' : 'Aceitar missão'}</button>
-        `;
-        container.appendChild(card);
-
-        // botão para aceitar missão
-        const btn = card.querySelector('button');
-        btn.addEventListener('click', ()=>{
-          alert(`Missão "${mission.title}" aceita! Boa sorte!`);
-          // aqui você pode implementar lógica extra de aceitar missão, armazenar estado, etc
-        });
+      const c=document.getElementById('missionsList');
+      c.innerHTML='';
+      missions.forEach(m=>{
+        const prog=m.progress(window.gameState);
+        const done=m.requirement(window.gameState);
+        const card=document.createElement('div');
+        card.className='mission-card';
+        card.innerHTML=`<div class="mission-title">${m.title}</div>
+        <div class="mission-desc">${m.desc}</div>
+        <div class="mission-reward">Recompensa: ${m.reward}</div>
+        <div class="mission-progress"><div style="width:${prog*100}%"></div></div>
+        <button class="mission-button" ${done?'disabled':''} data-id="${m.id}">${done?'Concluído':'Aceitar missão'}</button>`;
+        c.appendChild(card);
       });
     }
-
-    // Botão voltar para página do jogo (index.html)
-    document.getElementById('backBtn').addEventListener('click', () => {
-      window.location.href = 'index.html';
-    });
-
-    // Atualizar a lista de missões
+    document.getElementById('backBtn').addEventListener('click',()=>{window.location.href='index.html';});
     renderMissions();
-
-    // Você precisa garantir que o objeto gameState do seu jogo esteja disponível aqui
-    // Para integrar de verdade, você pode passar dados do jogo para essa página,
-    // via localStorage ou outro método (se quiser, posso te ajudar nisso!)
   </script>
 </body>
 </html>
